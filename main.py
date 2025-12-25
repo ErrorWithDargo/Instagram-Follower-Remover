@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+import customtkinter as ctk
 import threading
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -10,49 +11,54 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import random
 
+# Set Dark Appearance
+ctk.set_appearance_mode("Dark")
+ctk.set_default_color_theme("blue")
+
 class InstaRemoverApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Instagram Follower Remover")
-        self.root.geometry("400x500")
+        self.root.geometry("400x550")
         self.driver = None
         self.is_running = False
 
         # GUI Components
-        self.label_limit = tk.Label(root, text="Number of followers to remove:")
-        self.label_limit.pack(pady=(10, 0))
+        self.label_limit = ctk.CTkLabel(root, text="Number of followers to remove:")
+        self.label_limit.pack(pady=(20, 0))
 
-        self.entry_limit = tk.Entry(root)
+        self.entry_limit = ctk.CTkEntry(root)
         self.entry_limit.insert(0, "1000")
         self.entry_limit.pack(pady=5)
 
-        self.label_user = tk.Label(root, text="Your Instagram Username:")
+        self.label_user = ctk.CTkLabel(root, text="Your Instagram Username:")
         self.label_user.pack(pady=(10, 0))
 
-        self.entry_user = tk.Entry(root)
+        self.entry_user = ctk.CTkEntry(root)
         self.entry_user.pack(pady=5)
 
-        self.btn_open_browser = tk.Button(root, text="1. Open Browser & Login Manually", command=self.open_browser, bg="#4CAF50", fg="white")
+        self.btn_open_browser = ctk.CTkButton(root, text="1. Open Browser & Login Manually", command=self.open_browser, fg_color="#2E7D32")
         self.btn_open_browser.pack(pady=20, fill='x', padx=50)
 
-        self.label_status = tk.Label(root, text="Status: Waiting to start", fg="gray")
+        self.label_status = ctk.CTkLabel(root, text="Status: Waiting to start", text_color="gray")
         self.label_status.pack(pady=10)
 
-        self.btn_start = tk.Button(root, text="2. Start Removing", command=self.start_removal_thread, state=tk.DISABLED, bg="#2196F3", fg="white")
+        self.btn_start = ctk.CTkButton(root, text="2. Start Removing", command=self.start_removal_thread, state="disabled", fg_color="#1565C0")
         self.btn_start.pack(pady=10, fill='x', padx=50)
         
-        self.btn_stop = tk.Button(root, text="Stop", command=self.stop_removal, state=tk.DISABLED, bg="#f44336", fg="white")
+        self.btn_stop = ctk.CTkButton(root, text="Stop", command=self.stop_removal, state="disabled", fg_color="#C62828")
         self.btn_stop.pack(pady=10, fill='x', padx=50)
 
-        self.log_text = tk.Text(root, height=10, width=40, state=tk.DISABLED)
-        self.log_text.pack(pady=10,padx=10)
+        self.log_text = ctk.CTkTextbox(root, height=200, width=350)
+        self.log_text.pack(pady=10, padx=10)
+        self.log_text.configure(state="disabled")
 
     def log(self, message):
-        self.log_text.config(state=tk.NORMAL)
+        self.log_text.configure(state="normal")
         self.log_text.insert(tk.END, message + "\n")
         self.log_text.see(tk.END)
-        self.log_text.config(state=tk.DISABLED)
-        self.label_status.config(text=f"Status: {message}")
+        self.log_text.configure(state="disabled")
+        self.label_status.configure(text=f"Status: {message}")
 
     def open_browser(self):
         try:
@@ -60,8 +66,8 @@ class InstaRemoverApp:
             self.driver = webdriver.Chrome(service=service)
             self.driver.get("https://www.instagram.com/accounts/login/")
             self.log("Browser opened. Please Log in manually.")
-            self.btn_start.config(state=tk.NORMAL)
-            self.btn_open_browser.config(state=tk.DISABLED)
+            self.btn_start.configure(state="normal")
+            self.btn_open_browser.configure(state="disabled")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to open browser: {e}")
 
@@ -83,8 +89,8 @@ class InstaRemoverApp:
             return
 
         self.is_running = True
-        self.btn_start.config(state=tk.DISABLED)
-        self.btn_stop.config(state=tk.NORMAL)
+        self.btn_start.configure(state="disabled")
+        self.btn_stop.configure(state="normal")
         
         threading.Thread(target=self.remove_followers).start()
 
@@ -208,14 +214,14 @@ class InstaRemoverApp:
             self.log(f"Critical Error: {e}")
         finally:
             self.is_running = False
-            self.root.after(0, lambda: self.btn_start.config(state=tk.NORMAL))
-            self.root.after(0, lambda: self.btn_stop.config(state=tk.DISABLED))
+            self.root.after(0, lambda: self.btn_start.configure(state="normal"))
+            self.root.after(0, lambda: self.btn_stop.configure(state="disabled"))
 
     def stop_removal(self):
         self.is_running = False
         self.log("Stopping...")
 
 if __name__ == "__main__":
-    root = tk.Tk()
+    root = ctk.CTk()
     app = InstaRemoverApp(root)
     root.mainloop()
