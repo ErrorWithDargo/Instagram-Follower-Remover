@@ -1,5 +1,7 @@
 # Instagram Follower Remover
 
+![App Screenshot](screenshot.png)
+
 A simple Python GUI tool to automate removing followers on Instagram.
 
 ## Features
